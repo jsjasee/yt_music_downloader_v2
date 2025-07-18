@@ -1,8 +1,10 @@
+import base64
 import os
 from youtube_api import YouTubeDataAPI
 from dotenv import load_dotenv
 load_dotenv()
 from yt_dlp import YoutubeDL
+import requests
 
 # todo 1: get the relevant api keys for youtube api and bot credentials...
 # todo 2: see if gunicorn works once hosted on render
@@ -10,11 +12,22 @@ from yt_dlp import YoutubeDL
 API_KEY = os.getenv("YT_API_KEY")
 # USERNAME = os.getenv("COMPUTER_USER_NAME")
 
+# Decode base64 string and save as cookies.txt
+cookies_b64 = os.getenv("COOKIES_B64")
+cookies_path = "/tmp/cookies.txt"
+
+if cookies_b64:
+    with open(cookies_path, "wb") as file:
+        file.write(base64.b64decode(cookies_b64))
+else:
+    print("Missing COOKIES_B64 env variable")
+
 class ApiManager:
     def __init__(self):
         self.yt_api = YouTubeDataAPI(API_KEY)
         self.yt_downloader_options = {
         'format': 'bestaudio/best',
+        # 'cookiefile': cookies_path,
         'postprocessors': [{
             'key': 'FFmpegExtractAudio',
             'preferredcodec': 'mp3',
@@ -41,10 +54,3 @@ class ApiManager:
         print("Running the function: download_song")
         print(self.youtube_downloader.prepare_filename(mp3_info))
         return self.youtube_downloader.prepare_filename(mp3_info)
-
-    def get_song_info(self, url):
-        # performs the same function as download_song but this just extracts the data from the video
-        song_info = self.youtube_downloader.extract_info(url=url, download=False)
-        print("Running the function: get_song_info")
-        print(song_info)
-        return song_info

@@ -17,6 +17,7 @@ class BotManager:
         self.yt_searcher = ApiManager()
         self.user_state = {}
         self.user_last_message = {}
+        self.chosen_song = {}
 
         self.bot.message_handler(commands=['start'])(self.start)
         self.bot.message_handler(commands=['search'])(self.search_music)
@@ -51,8 +52,11 @@ class BotManager:
         results = self.yt_searcher.search(query=query)
         markup = InlineKeyboardMarkup()
 
-        for result in results:
-            button = InlineKeyboardButton(text=html.unescape(result['video_title']), callback_data=result["video_id"])
+        self.chosen_song = {}
+        for num in range(len(results)):
+            print(results[num])
+            self.chosen_song[num] = results[num]
+            button = InlineKeyboardButton(text=html.unescape(results[num]['video_title']), callback_data=str(num))
             markup.add(button)
 
         song_list_msg = self.bot.send_message(message.chat.id, "Choose a song: ", reply_markup=markup)
@@ -65,25 +69,27 @@ class BotManager:
         # Add the newly sent message to the last message
         self.user_last_message[call.message.chat.id] = download_in_progress_msg.message_id
 
-        video_id = call.data
+        song_number = int(call.data)
+        video_id = self.chosen_song[song_number]['video_id']
         youtube_url = f"https://www.youtube.com/watch?v={video_id}"
-        file_path = self.yt_searcher.download_song(url=youtube_url).replace(".webm", ".mp3")
-        song_info = self.yt_searcher.get_song_info(url=youtube_url)
-        try:
-            with open(file_path, "rb") as song:
-                # telegram reads audio files in binary mode, hence rb.
-                self.bot.send_audio(call.message.chat.id, audio=song, performer=song_info['title'], title=song_info['title'], timeout=300)
-                # open the mp3 file downloaded on computer and then send this file to telegram. make sure to include
-                # performer and title details so the audio shows up properly on telegram
-        except Exception as e:
-            # Remove the last message
-            self.bot.delete_message(call.message.chat.id, self.user_last_message[call.message.chat.id])
-            self.bot.send_message(call.message.chat.id, f"❌ Error encountered when downloading bot. Please try again: {e}")
+        # file_path = self.yt_searcher.download_song(url=youtube_url).replace(".webm", ".mp3")
+        # try:
+        #     with open(file_path, "rb") as song:
+        #         # telegram reads audio files in binary mode, hence rb.
+        #         self.bot.send_audio(call.message.chat.id, audio=song, performer=self.chosen_song[song_number]["channel_title"], title=self.chosen_song[song_number]['video_title'], timeout=300)
+        #         # open the mp3 file downloaded on computer and then send this file to telegram. make sure to include
+        #         # performer and title details so the audio shows up properly on telegram
+        # except Exception as e:
+        #     # Remove the last message
+        #     self.bot.delete_message(call.message.chat.id, self.user_last_message[call.message.chat.id])
+        #     self.bot.send_message(call.message.chat.id, f"❌ Error encountered when downloading bot. Please try again: {e}")
 
-        self.bot.send_message(call.message.chat.id, "Downloaded song. Enjoy! 🎉")
+        self.bot.send_message(call.message.chat.id,
+                              f"Download the song here: https://cnvmp3.com/v25 🎉")
+        self.bot.send_message(call.message.chat.id, youtube_url, disable_web_page_preview=False)
         # Remove the last message
         self.bot.delete_message(call.message.chat.id, self.user_last_message[call.message.chat.id])
 
-        if os.path.exists(file_path):
-            # os is a module, path is a SUB-module inside the os module. .exists() is a function, which checks if the file path exists or not
-            os.remove(file_path)
+        # if os.path.exists(file_path):
+        #     # os is a module, path is a SUB-module inside the os module. .exists() is a function, which checks if the file path exists or not
+        #     os.remove(file_path)
