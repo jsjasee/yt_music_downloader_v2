@@ -85,7 +85,7 @@ class BotManager:
         #     self.bot.send_message(call.message.chat.id, f"❌ Error encountered when downloading bot. Please try again: {e}")
 
         self.bot.send_message(call.message.chat.id,
-                              f"Download the song here: https://cnvmp3.com/v25 🎉")
+                              f"Download the song here: https://ezmp3.to/ (or try cnvmp3) 🎉")
         self.bot.send_message(call.message.chat.id, youtube_url, disable_web_page_preview=False)
         # Remove the last message
         self.bot.delete_message(call.message.chat.id, self.user_last_message[call.message.chat.id])
