@@ -4,7 +4,6 @@ from youtube_api import YouTubeDataAPI
 from dotenv import load_dotenv
 load_dotenv()
 from yt_dlp import YoutubeDL
-import requests
 
 # todo 1: get the relevant api keys for youtube api and bot credentials...
 # todo 2: see if gunicorn works once hosted on render

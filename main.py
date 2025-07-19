@@ -17,7 +17,7 @@ def home():
 
 @app.route("/test-telegram")
 def test_telegram():
-    token = os.getenv("TOKEN")  # Replace with your bot token
+    token = os.getenv("BOT_TOKEN")  # Replace with your bot token
     url = f"https://api.telegram.org/bot{token}/getMe"
     try:
         response = requests.get(url, timeout=10)
