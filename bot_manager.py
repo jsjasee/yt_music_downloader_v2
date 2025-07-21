@@ -40,7 +40,8 @@ class BotManager:
     # replacing all CHAT_ID with message.chat.id
     def search_music(self, message):
         # if got any previous song lists, delete those to avoid user from clicking an old song list, causing errors
-        self.bot.delete_message(message.chat.id, self.user_last_message[message.chat.id])
+        if message.chat.id in self.user_last_message:
+            self.bot.delete_message(message.chat.id, self.user_last_message[message.chat.id])
 
         self.bot.send_message(chat_id=message.chat.id, text="🔎 Please enter the song name:")
         # change user state to 'searching song'
