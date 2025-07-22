@@ -11,16 +11,6 @@ from yt_dlp import YoutubeDL
 API_KEY = os.getenv("YT_API_KEY")
 # USERNAME = os.getenv("COMPUTER_USER_NAME")
 
-# Decode base64 string and save as cookies.txt
-cookies_b64 = os.getenv("COOKIES_B64")
-cookies_path = "/tmp/cookies.txt"
-
-if cookies_b64:
-    with open(cookies_path, "wb") as file:
-        file.write(base64.b64decode(cookies_b64))
-else:
-    print("Missing COOKIES_B64 env variable")
-
 class ApiManager:
     def __init__(self):
         self.yt_api = YouTubeDataAPI(API_KEY)
